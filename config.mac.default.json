@@ -1,0 +1,92 @@
+{
+  "columns": 4,
+  "landscapeColumns": 6,
+  "rows": 4,
+  "pages": [
+    {
+      "name": "앱",
+      "buttons": [
+        { "label": "구글 크롬", "icon": "chrome", "image": "auto", "action": { "type": "open", "target": "Google Chrome" } },
+        { "label": "Finder", "icon": "folder", "image": "auto", "action": { "type": "open", "target": "Finder" } },
+        { "label": "메모", "icon": "file-pen-line", "image": "auto", "action": { "type": "open", "target": "Notes" } },
+        { "label": "계산기", "icon": "calculator", "image": "auto", "action": { "type": "open", "target": "Calculator" } },
+        { "label": "유튜브", "icon": "youtube", "image": "youtube.svg", "action": { "type": "open", "target": "https://www.youtube.com" } },
+        { "label": "인스타그램", "icon": "instagram", "image": "instagram.svg", "action": { "type": "open", "target": "https://www.instagram.com" } },
+        { "label": "틱톡", "icon": "music", "image": "tiktok.svg", "action": { "type": "open", "target": "https://www.tiktok.com" } }
+      ]
+    },
+    {
+      "name": "다이얼",
+      "apps": ["Adobe Premiere Pro", "After Effects"],
+      "buttons": [
+        { "label": "PC 볼륨", "color": "#3ddc84", "dial": { "type": "volume", "step": 1, "fastStep": 5 } },
+        { "label": "타임라인 조그", "icon": "film", "color": "#9b7bff", "dial": { "type": "keys", "left": "left", "right": "right", "fastLeft": "shift+left", "fastRight": "shift+right", "press": { "type": "hotkey", "keys": "space" } } },
+        { "label": "음소거", "icon": "volume-x", "action": { "type": "volmute" } },
+        { "label": "재생/정지", "icon": "play", "action": { "type": "hotkey", "keys": "space" } },
+        { "label": "처음으로", "icon": "arrow-left-to-line", "action": { "type": "hotkey", "keys": "home" } },
+        { "label": "끝으로", "icon": "arrow-right-to-line", "action": { "type": "hotkey", "keys": "end" } },
+        { "label": "마커 추가", "icon": "map-pin", "action": { "type": "hotkey", "keys": "m" } },
+        { "label": "자르기", "icon": "scissors", "action": { "type": "hotkey", "keys": "cmd+k" } },
+        { "label": "확대", "icon": "zoom-in", "action": { "type": "hotkey", "keys": "equal" } },
+        { "label": "축소", "icon": "zoom-out", "action": { "type": "hotkey", "keys": "minus" } }
+      ]
+    },
+    {
+      "name": "색보정",
+      "apps": ["Adobe Premiere Pro", "After Effects"],
+      "lang": "en",
+      "buttons": [
+        { "label": "Exposure", "icon": "sun", "color": "#ffd43b", "span": 1, "dial": { "type": "lumetri", "param": "exposure", "step": 0.1, "fastStep": 1 } },
+        { "label": "Contrast", "icon": "contrast", "color": "#e9e9ee", "span": 1, "dial": { "type": "lumetri", "param": "contrast", "step": 0.1, "fastStep": 1 } },
+        { "label": "Highlights", "icon": "sun-medium", "color": "#ff9f43", "span": 1, "dial": { "type": "lumetri", "param": "highlights", "step": 0.1, "fastStep": 1 } },
+        { "label": "Shadows", "icon": "moon", "color": "#9b7bff", "span": 1, "dial": { "type": "lumetri", "param": "shadows", "step": 0.1, "fastStep": 1 } },
+        { "label": "Whites", "icon": "circle", "color": "#e9e9ee", "span": 1, "dial": { "type": "lumetri", "param": "whites", "step": 0.1, "fastStep": 1 } },
+        { "label": "Blacks", "icon": "circle-dot", "color": "#8b8b96", "span": 1, "dial": { "type": "lumetri", "param": "blacks", "step": 0.1, "fastStep": 1 } },
+        { "label": "Temperature", "icon": "thermometer", "color": "#ff5c8a", "span": 1, "dial": { "type": "lumetri", "param": "temperature", "step": 0.1, "fastStep": 1 } },
+        { "label": "Saturation", "icon": "droplet", "color": "#3dd6d0", "span": 1, "dial": { "type": "lumetri", "param": "saturation", "step": 0.1, "fastStep": 1 } },
+        { "label": "Undo", "icon": "undo-2", "action": { "type": "hotkey", "keys": "cmd+z" } },
+        { "label": "Redo", "icon": "redo-2", "action": { "type": "hotkey", "keys": "cmd+shift+z" } },
+        { "label": "Play/Pause", "icon": "play", "action": { "type": "hotkey", "keys": "space" } },
+        { "label": "Add Marker", "icon": "map-pin", "action": { "type": "hotkey", "keys": "m" } }
+      ]
+    },
+    {
+      "name": "기본",
+      "buttons": [
+        { "label": "재생/일시정지", "icon": "play", "action": { "type": "hotkey", "keys": "playpause" } },
+        { "label": "이전 곡", "icon": "skip-back", "action": { "type": "hotkey", "keys": "prev" } },
+        { "label": "다음 곡", "icon": "skip-forward", "action": { "type": "hotkey", "keys": "next" } },
+        { "label": "음소거", "icon": "volume-x", "action": { "type": "hotkey", "keys": "mute" } },
+        { "label": "볼륨 -", "icon": "volume-1", "action": { "type": "hotkey", "keys": "voldown, voldown" } },
+        { "label": "볼륨 +", "icon": "volume-2", "action": { "type": "hotkey", "keys": "volup, volup" } },
+        { "label": "바탕화면", "icon": "monitor", "action": { "type": "hotkey", "keys": "f11" } },
+        { "label": "작업 전환", "icon": "layout-grid", "action": { "type": "hotkey", "keys": "ctrl+up" } },
+        { "label": "캡처", "icon": "scan-line", "action": { "type": "hotkey", "keys": "cmd+shift+4" } },
+        { "label": "복사", "icon": "copy", "action": { "type": "hotkey", "keys": "cmd+c" } },
+        { "label": "붙여넣기", "icon": "clipboard-paste", "action": { "type": "hotkey", "keys": "cmd+v" } },
+        { "label": "실행 취소", "icon": "undo-2", "action": { "type": "hotkey", "keys": "cmd+z" } },
+        { "label": "유튜브", "icon": "youtube", "action": { "type": "open", "target": "https://www.youtube.com" } },
+        { "label": "다운로드 폴더", "icon": "folder-down", "action": { "type": "open", "target": "~/Downloads" } },
+        { "label": "메모", "icon": "file-pen-line", "action": { "type": "open", "target": "Notes" } },
+        { "label": "매크로 ▶", "icon": "keyboard", "action": { "type": "page", "page": "매크로" } }
+      ]
+    },
+    {
+      "name": "매크로",
+      "buttons": [
+        { "label": "인사말", "icon": "hand", "action": { "type": "text", "text": "안녕하세요! 영상 봐주셔서 감사합니다 🙏" } },
+        { "label": "자주 쓰는 문구", "icon": "message-square-text", "action": { "type": "text", "text": "여기에 자주 쓰는 문구를 넣어 보세요" } },
+        { "label": "오늘 날짜", "icon": "calendar-days", "action": { "type": "run", "command": "date +%F | tr -d '\\n' | pbcopy && osascript -e 'tell application \"System Events\" to keystroke \"v\" using command down'" } },
+        { "label": "한/영", "icon": "languages", "action": { "type": "hotkey", "keys": "ctrl+space" } },
+        { "label": "새 탭", "icon": "plus", "action": { "type": "hotkey", "keys": "cmd+t" } },
+        { "label": "탭 닫기", "icon": "x", "action": { "type": "hotkey", "keys": "cmd+w" } },
+        { "label": "닫은 탭 열기", "icon": "history", "action": { "type": "hotkey", "keys": "cmd+shift+t" } },
+        { "label": "새로고침", "icon": "refresh-cw", "action": { "type": "hotkey", "keys": "cmd+r" } },
+        { "label": "전체선택→복사", "icon": "copy-check", "action": { "type": "multi", "steps": [{ "type": "hotkey", "keys": "cmd+a" }, { "type": "hotkey", "keys": "cmd+c" }] } },
+        { "label": "활성 상태 보기", "icon": "activity", "action": { "type": "open", "target": "Activity Monitor" } },
+        { "label": "화면 잠금", "icon": "lock", "action": { "type": "hotkey", "keys": "ctrl+cmd+q" } },
+        { "label": "◀ 기본", "icon": "house", "action": { "type": "page", "page": "기본" } }
+      ]
+    }
+  ]
+}

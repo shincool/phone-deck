@@ -1,0 +1,10 @@
+# 줄바꿈 고정: 맥 스크립트는 LF, Windows 스크립트는 CRLF (다른 운영체제에서 받아도 깨지지 않게)
+* text=auto
+*.command text eol=lf
+*.swift text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.vbs text eol=crlf
+*.png binary
+*.jpg binary

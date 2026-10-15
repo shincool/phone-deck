@@ -1,0 +1,14 @@
+{
+  "name": "phone-deck",
+  "version": "1.0.0",
+  "description": "아이폰을 스트림덱처럼 쓰는 Wi-Fi 리모컨 (Windows/맥 PC 에이전트 + 아이폰 홈 화면 앱)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "private": true
+}

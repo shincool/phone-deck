@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phone Deck 연결</title>
+  <link rel="icon" href="/icon.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <style>
+    :root { --bg: #111318; --card: #1b1e27; --text: #f2f4f8; --muted: #8a91a3; --accent: #4a7dff; }
+    body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: "Segoe UI", "Malgun Gothic", sans-serif; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+    .card { background: var(--card); border-radius: 20px; padding: 32px; max-width: 460px; width: 100%; text-align: center; }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    p { color: var(--muted); line-height: 1.6; margin: 0 0 20px; }
+    #qr { background: #fff; border-radius: 14px; padding: 14px; display: inline-block; line-height: 0; }
+    #qr img { width: 240px; height: 240px; image-rendering: pixelated; }
+    .url { margin-top: 18px; font-family: Consolas, monospace; font-size: 14px; word-break: break-all; color: var(--text); }
+    .code { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    .code b { color: var(--text); font-family: Consolas, monospace; letter-spacing: 1px; }
+    select { margin-top: 14px; background: #262a36; color: var(--text); border: 1px solid #333a4a; border-radius: 8px; padding: 6px 10px; font: inherit; }
+    ol { text-align: left; color: var(--muted); line-height: 1.8; padding-left: 20px; margin: 24px 0 0; font-size: 14px; }
+    ol b { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>아이폰 연결</h1>
+    <p>아이폰과 이 PC가 <b>같은 Wi-Fi</b>에 연결되어 있어야 합니다.<br>
+      기본 QR은 Wi-Fi가 바뀌어도 그대로 쓸 수 있는 주소입니다. 접속이 안 되면 아래 목록에서 IP 주소를 고르세요.</p>
+    <div id="qr"></div>
+    <div><select id="addr" hidden></select></div>
+    <div class="url" id="url"></div>
+    <div class="code">접속 코드: <b id="token"></b></div>
+    <ol>
+      <li>아이폰 <b>카메라</b>로 QR 코드를 비추고 뜨는 링크를 누릅니다.</li>
+      <li>사파리 하단의 <b>공유 버튼 → 홈 화면에 추가</b>를 누릅니다.</li>
+      <li>이제 홈 화면의 <b>Phone Deck</b> 아이콘으로 전체 화면으로 실행됩니다.</li>
+      <li>버튼을 추가하거나 동작을 바꾸려면 <a href="/edit" style="color:#2bd46a">PC 편집 화면</a>을 여세요.</li>
+    </ol>
+  </div>
+  <script>
+    // PC의 Wi-Fi 주소는 네트워크를 옮기면 바뀌므로 5초마다 다시 확인해 QR을 갱신
+    let lastKey = '';
+    const sel = document.getElementById('addr');
+    const urlEl = document.getElementById('url');
+    const box = document.getElementById('qr');
+
+    function show(ip, port, token) {
+      const url = `http://${ip}:${port}/?t=${token}`;
+      urlEl.textContent = url;
+      box.style.display = '';
+      if (window.qrcode) {
+        const qr = qrcode(0, 'M'); qr.addData(url); qr.make();
+        box.innerHTML = qr.createImgTag(6, 0);
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    async function refresh() {
+      let data;
+      try {
+        data = await (await fetch('/api/setup', { cache: 'no-store' })).json();
+      } catch {
+        urlEl.textContent = 'Phone Deck 서버가 꺼져 있습니다. start.bat 을 실행하세요.';
+        box.style.display = 'none';
+        lastKey = '';
+        return;
+      }
+      const { port, token, host, addresses } = data;
+      const key = JSON.stringify(data);
+      if (key === lastKey) return;
+      lastKey = key;
+      document.getElementById('token').textContent = token;
+      if (!addresses.length) {
+        urlEl.textContent = 'Wi-Fi 주소를 찾지 못했습니다. 네트워크 연결을 확인하세요.';
+        box.style.display = 'none';
+        return;
+      }
+      // 기본은 고정 이름(phonedeck.local) — Wi-Fi가 바뀌어도 홈 화면 아이콘이 그대로 작동
+      const choices = [...(host ? [host] : []), ...addresses];
+      const keep = choices.includes(sel.value) ? sel.value : choices[0];
+      sel.replaceChildren(...choices.map(a => new Option(a === host ? `${a} (자동 연결 · 추천)` : `${a} (IP 주소)`, a)));
+      sel.value = keep;
+      sel.hidden = choices.length < 2;
+      sel.onchange = () => show(sel.value, port, token);
+      show(keep, port, token);
+    }
+
+    refresh();
+    setInterval(refresh, 5000);
+  </script>
+</body>
+</html>

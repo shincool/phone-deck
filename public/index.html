@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Phone Deck">
+  <meta name="theme-color" content="#0b0b0d">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" href="/icon.png">
+  <link rel="stylesheet" href="/style.css">
+  <title>Phone Deck</title>
+</head>
+<body>
+  <div class="device">
+    <header class="top">
+      <span id="status" class="dot" title="연결 상태"></span>
+      <button id="brandBtn" class="brand" type="button" title="조작할 컴퓨터 바꾸기">phonedeck</button>
+      <span class="top-right">
+        <span id="pageTitle" class="pname"></span>
+        <button id="editBtn" class="icon-btn" aria-label="편집"><i data-lucide="pencil"></i></button>
+        <button id="reloadBtn" class="icon-btn" aria-label="새로고침"><i data-lucide="rotate-cw"></i></button>
+      </span>
+    </header>
+
+    <div id="editBar" class="edit-bar" hidden>
+      <span>탭해서 꾸미기 · 끌어서 자리 바꾸기</span>
+      <button id="editDone" type="button">완료</button>
+    </div>
+
+    <main id="deck" class="panel" aria-live="polite"></main>
+
+    <nav id="tabs" class="pages"></nav>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- 조작할 컴퓨터 고르기 / 추가 -->
+  <section id="compSheet" class="sheet" hidden>
+    <div class="sheet-card" role="dialog" aria-label="조작할 컴퓨터">
+      <h3 class="sheet-title">조작할 컴퓨터</h3>
+      <div id="compList" class="comp-list"></div>
+      <form id="compForm" class="comp-form">
+        <div class="sheet-sub">다른 컴퓨터 추가 — 그 컴퓨터의 접속 안내(QR) 페이지에 나온 주소와 접속 코드를 입력하세요.</div>
+        <input id="compAddr" placeholder="주소 (예: phonedeck-mac.local)" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <input id="compCode" placeholder="접속 코드" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <input id="compName" placeholder="이름 (선택, 예: 맥북)" autocomplete="off">
+        <div id="compMsg" class="comp-msg"></div>
+        <div class="sheet-actions">
+          <button id="compClose" type="button">닫기</button>
+          <button type="submit" class="primary">추가하고 연결</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 편집 모드: 버튼 꾸미기 창 -->
+  <section id="sheet" class="sheet" hidden>
+    <div class="sheet-card" role="dialog" aria-label="버튼 꾸미기">
+      <div class="sheet-head">
+        <div class="key preview" id="sheetPreview"><span class="pv-icon"></span><span class="lb"></span></div>
+        <div class="sheet-fields">
+          <label class="sheet-label">이름<input id="sheetLabel" maxlength="40" autocomplete="off"></label>
+          <div class="swatches" id="sheetColors" aria-label="테두리 색"></div>
+        </div>
+      </div>
+      <div id="sheetPicker" class="sheet-picker"></div>
+      <div class="sheet-actions">
+        <button id="sheetCancel" type="button">취소</button>
+        <button id="sheetSave" type="button" class="primary">저장</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="login" class="login" hidden>
+    <div class="login-card">
+      <h2>PC와 연결하기</h2>
+      <p>PC에서 <b>Phone Deck</b>을 실행하고 화면의 QR 코드를 아이폰 카메라로 찍어 주세요.</p>
+      <p class="muted">또는 PC 창에 표시된 접속 코드를 입력하세요.</p>
+      <form id="loginForm">
+        <input id="tokenInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="접속 코드">
+        <button type="submit">연결</button>
+      </form>
+    </div>
+  </section>
+
+  <script src="/lucide.min.js"></script>
+  <script src="/icon-picker.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

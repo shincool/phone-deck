@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Phone Deck</title>
+<style>
+  body { margin: 0; padding: 14px; background: #232323; color: #ddd; font: 13px "Segoe UI", "Malgun Gothic", sans-serif; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #777; }
+  .dot.on { background: #2bd46a; box-shadow: 0 0 6px #2bd46a; }
+  .dot.off { background: #ff5c5c; }
+  .muted { color: #999; font-size: 12px; line-height: 1.6; }
+  #last { margin-top: 8px; font-family: Consolas, monospace; font-size: 12px; color: #bbb; word-break: break-all; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="dot" id="dot"></span><b id="state">확인 중…</b></div>
+  <div class="muted">아이폰 Phone Deck 의 <b>색보정</b> 다이얼로 선택한 클립(없으면 재생 헤드 아래 클립)의 Lumetri 값을 조절합니다.<br>
+    클립에 Lumetri Color 효과가 한 번은 들어가 있어야 합니다. 이 창은 닫아도 연결은 계속 유지됩니다.</div>
+  <div id="last"></div>
+<script>
+  /* global require */
+  const http = require('http');
+  function get(p) {
+    return new Promise((resolve, reject) => {
+      http.get({ host: '127.0.0.1', port: 8765, path: p, headers: { Host: 'localhost:8765' }, timeout: 3000 }, res => {
+        let t = ''; res.on('data', c => { t += c; }); res.on('end', () => { try { resolve(JSON.parse(t)); } catch (e) { reject(e); } });
+      }).on('error', reject).on('timeout', function () { this.destroy(new Error('timeout')); });
+    });
+  }
+  async function tick() {
+    const dot = document.getElementById('dot'), state = document.getElementById('state'), last = document.getElementById('last');
+    try {
+      const s = await get('/api/premiere-status');
+      dot.className = 'dot ' + (s.connected ? 'on' : 'off');
+      state.textContent = s.connected ? 'Phone Deck 과 연결됨' : 'Phone Deck 서버는 켜져 있지만 브리지 연결 대기 중';
+      last.textContent = s.last ? `마지막: ${s.last.key} = ${s.last.ok ? s.last.value : '오류 - ' + s.last.error}` : '';
+    } catch (e) {
+      dot.className = 'dot off';
+      state.textContent = 'Phone Deck 서버가 꺼져 있습니다';
+      last.textContent = '';
+    }
+  }
+  tick();
+  setInterval(tick, 2000);
+</script>
+</body>
+</html>
