@@ -55,6 +55,7 @@
 | `stop.bat` | Phone Deck을 끕니다 |
 | `autostart-on.bat` | PC에 로그인하면 **창 없이** 자동으로 켜지게 합니다 |
 | `autostart-off.bat` | 자동 실행을 끕니다 |
+| `open.vbs` | **바로가기용:** 꺼져 있으면 창 없이 켠 뒤 Phone Deck 화면을 엽니다. 바탕화면 바로가기의 대상을 `wscript.exe "…\open.vbs"`로 하면 됩니다. 특정 브라우저로 열려면 뒤에 브라우저 경로와 주소를 붙입니다 |
 
 자동 실행 중에 나오는 기록은 `deck.log`에 남습니다. **새 버전으로 업데이트했다면 `stop.bat` → `start.bat` 순서로 다시 켜세요.** `start.bat`만 다시 누르면 예전 버전이 계속 실행됩니다.
 
