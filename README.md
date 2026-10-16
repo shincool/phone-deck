@@ -57,6 +57,13 @@
 | `autostart-off.bat` | 자동 실행을 끕니다 |
 | `open.vbs` | **바로가기용:** 꺼져 있으면 창 없이 켠 뒤 Phone Deck 화면을 엽니다. 바탕화면 바로가기의 대상을 `wscript.exe "…\open.vbs"`로 하면 됩니다. 특정 브라우저로 열려면 뒤에 브라우저 경로와 주소를 붙입니다 |
 
+**PC에서 앱처럼 띄우기:** 바탕화면 바로가기를 아래처럼 만들면, 주소창과 탭이 없는 **독립된 Phone Deck 창**이 열립니다. Phone Deck이 꺼져 있으면 먼저 켜고 엽니다.
+- 대상: `C:\Windows\System32\wscript.exe`
+- 인자: `"<Phone Deck 폴더>\open.vbs" "C:\Program Files\Google\Chrome\Application\chrome.exe" --app=http://localhost:8765/ --window-size=430,900`
+- 시작 위치: Phone Deck 폴더
+
+Edge를 쓰려면 크롬 경로 대신 `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`를 넣으면 됩니다.
+
 자동 실행 중에 나오는 기록은 `deck.log`에 남습니다. **새 버전으로 업데이트했다면 `stop.bat` → `start.bat` 순서로 다시 켜세요.** `start.bat`만 다시 누르면 예전 버전이 계속 실행됩니다.
 
 ## 버튼 편집하기
