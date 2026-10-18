@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const zlib = require('zlib');
 const { spawn, execFile, execFileSync } = require('child_process');
 const mdns = require('./mdns');
+const shareMod = require('./share');
 let localName = null;   // 예: phonedeck.local
 
 const ROOT = __dirname;
@@ -442,6 +443,7 @@ function findButton(pageIdx, btnIdx) {
 
 // ---------- 실시간 연결 (Server-Sent Events) ----------
 const clients = new Set();
+const share = shareMod.create({ getConfig: () => config, broadcast: (e, d) => broadcast(e, d), log: m => console.log(m) });
 function broadcast(event, data) {
   const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
   for (const res of clients) res.write(msg);
@@ -607,6 +609,9 @@ const server = http.createServer(async (req, res) => {
       return res.end(ICON);
     }
 
+    // 아이폰에서 '공유 → PC로 보내기' 단축어를 만드는 안내 (접속 코드는 주소의 ?t= 로 받음)
+    if (req.method === 'GET' && p === '/share-setup') return serveFile(res, 'share-setup.html');
+
     // PC에서만 열 수 있는 접속 안내 페이지 (QR 코드)
     if (req.method === 'GET' && p === '/setup') {
       if (!isLocal(req)) return json(res, 403, { error: 'PC에서만 열 수 있습니다' });
@@ -687,6 +692,22 @@ const server = http.createServer(async (req, res) => {
       if (req.method === 'GET' && p === '/api/config') {
         return json(res, 200, { version: configVersion, error: configError, config: clientConfig });
       }
+      // 아이폰 단축어 '공유 → PC로 보내기': 본문 { url, mode: auto|video|audio|page }
+      // 단축어가 결과를 그대로 알림으로 띄우도록 기본은 짧은 글자로 답한다 (?format=json 이면 JSON)
+      if (req.method === 'POST' && p === '/api/share') {
+        // 단축어 설정이 조금 달라도 받도록: 키 이름(url/URL/텍스트…)과 본문 형식(JSON/글자)을 가리지 않고 주소를 찾는다
+        const raw = (await readRaw(req, 1e6)).toString('utf8');
+        let body = {};
+        try { body = JSON.parse(raw); } catch { body = { text: raw }; }
+        const mode = typeof body.mode === 'string' ? body.mode.toLowerCase() : undefined;
+        const all = typeof body === 'object' && body ? JSON.stringify(Object.values(body)) : String(body);
+        const r = share.start(shareMod.findUrl(body.url) || all, mode);
+        if (!r.ok) console.log(`  ⇪ 공유 받음 — 주소 없음 (키: ${Object.keys(body || {}).join(', ') || '없음'}, 길이 ${raw.length})`);
+        if (url.searchParams.get('format') === 'json') return json(res, r.ok ? 200 : 400, r);
+        res.writeHead(r.ok ? 200 : 400, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+        return res.end(r.message);
+      }
+      if (req.method === 'GET' && p === '/api/share') return json(res, 200, { jobs: share.recent() });
       if (req.method === 'GET' && p === '/api/events') {
         res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
         res.write(`event: hello\ndata: ${JSON.stringify({ version: configVersion, host: os.hostname() })}\n\n`);

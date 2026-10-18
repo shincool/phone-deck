@@ -64,6 +64,12 @@ function connectEvents() {
   events.addEventListener('volume', e => { volume = JSON.parse(e.data); refreshVolumeDials(); });
   events.addEventListener('app', e => onForegroundApp(JSON.parse(e.data)));
   events.addEventListener('lumetri', e => onLumetri(JSON.parse(e.data)));
+  // 공유로 PC에 보낸 것이 끝나면 알려줌
+  events.addEventListener('share', e => {
+    const j = JSON.parse(e.data);
+    if (j.status === 'done') toast(j.folder ? `✓ ${j.folder} 폴더에 저장됨` : `✓ ${j.file || j.title || j.target} 저장됨`);
+    else if (j.status === 'error') toast(`공유 실패: ${j.error}`, true);
+  });
   events.onerror = () => setStatus(false);   // EventSource 가 자동으로 재연결함
 }
 

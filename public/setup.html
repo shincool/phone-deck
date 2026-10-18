@@ -15,6 +15,11 @@
     p { color: var(--muted); line-height: 1.6; margin: 0 0 20px; }
     #qr { background: #fff; border-radius: 14px; padding: 14px; display: inline-block; line-height: 0; }
     #qr img { width: 240px; height: 240px; image-rendering: pixelated; }
+    .share { margin-top: 28px; padding-top: 24px; border-top: 1px solid #2a2f3c; }
+    .share h2 { margin: 0 0 8px; font-size: 18px; }
+    .share p { margin-bottom: 16px; }
+    #qr2 { background: #fff; border-radius: 14px; padding: 10px; display: inline-block; line-height: 0; }
+    #qr2 img { width: 160px; height: 160px; image-rendering: pixelated; }
     .url { margin-top: 18px; font-family: Consolas, monospace; font-size: 14px; word-break: break-all; color: var(--text); }
     .code { margin-top: 8px; color: var(--muted); font-size: 14px; }
     .code b { color: var(--text); font-family: Consolas, monospace; letter-spacing: 1px; }
@@ -38,6 +43,12 @@
       <li>이제 홈 화면의 <b>Phone Deck</b> 아이콘으로 전체 화면으로 실행됩니다.</li>
       <li>버튼을 추가하거나 동작을 바꾸려면 <a href="/edit" style="color:#2bd46a">PC 편집 화면</a>을 여세요.</li>
     </ol>
+    <div class="share">
+      <h2>공유 → PC로 보내기</h2>
+      <p>유튜브·인스타·웹페이지를 아이폰에서 <b>공유</b>하면 PC가 대신 받아 둡니다.<br>
+        아래 QR을 찍으면 단축어 만드는 방법이 나와요.</p>
+      <div id="qr2" class="qr"></div>
+    </div>
   </div>
   <script>
     // PC의 Wi-Fi 주소는 네트워크를 옮기면 바뀌므로 5초마다 다시 확인해 QR을 갱신
@@ -53,6 +64,8 @@
       if (window.qrcode) {
         const qr = qrcode(0, 'M'); qr.addData(url); qr.make();
         box.innerHTML = qr.createImgTag(6, 0);
+        const qr2 = qrcode(0, 'M'); qr2.addData(`http://${ip}:${port}/share-setup?t=${token}`); qr2.make();
+        document.getElementById('qr2').innerHTML = qr2.createImgTag(5, 0);
       } else {
         box.style.display = 'none';
       }
