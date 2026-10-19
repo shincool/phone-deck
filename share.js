@@ -3,7 +3,7 @@
 //  - 그 밖의 웹페이지는 웹 캡처로 PDF·마크다운 저장
 //  - 두 프로그램이 꺼져 있으면 알아서 켠다
 // 위치는 config.json 의 "share" 로 바꿀 수 있다:
-//   "share": { "downloaderDir": "D:\\yt-web", "captureDir": "...\\web-capture", "saveDir": "...\\Downloads", "login": "none",
+//   "share": { "downloaderDir": "...\\yt-web", "captureDir": "...\\web-capture", "saveDir": "...\\Downloads", "login": "none",
 //              "organizerDir": "...\\download-organizer", "autoSort": true }   ← autoSort: 받은 파일을 바로 제자리 폴더로
 const http = require('http');
 const fs = require('fs');
@@ -12,6 +12,7 @@ const os = require('os');
 const crypto = require('crypto');
 const { spawn, execFile } = require('child_process');
 
+const TOOLS = path.dirname(__dirname);   // 내 프로그램들을 모아 둔 폴더 (phone-deck 의 부모)
 const VIDEO_HOSTS = /(^|\.)(youtube\.com|youtu\.be|instagram\.com|tiktok\.com)$/i;
 const DL = { host: '127.0.0.1', port: 5000, name: '통합 다운로더' };
 const CAP = { host: '127.0.0.1', port: 8780, name: '웹 캡처' };
@@ -22,12 +23,13 @@ function settings(config) {
   const s = (config && config.share) || {};
   const home = os.homedir();
   return {
-    downloaderDir: s.downloaderDir || 'D:\\yt-web',
-    captureDir: s.captureDir || path.join(home, 'Downloads', 'web-capture'),
+    // 기본값: 폰덱과 같은 '내프로그램' 폴더 안의 옆 폴더들 (폴더째 옮겨도 그대로 찾음)
+    downloaderDir: s.downloaderDir || path.join(TOOLS, 'yt-web'),
+    captureDir: s.captureDir || path.join(TOOLS, 'web-capture'),
     saveDir: s.saveDir || path.join(home, 'Downloads'),
     python: s.python || 'python',
     login: s.login || 'none',
-    organizerDir: s.organizerDir || path.join(home, 'Downloads', 'download-organizer'),
+    organizerDir: s.organizerDir || path.join(TOOLS, 'download-organizer'),
     autoSort: s.autoSort !== false,
   };
 }
@@ -168,7 +170,16 @@ function create({ getConfig, broadcast, log }) {
     const update = fields => { Object.assign(job, fields); broadcast('share', job); };
     const s = settings(getConfig());
     log(`  ⇪ 공유 받음 → ${job.target}: ${url}`);
-    (video ? runDownload : runCapture)(job, s, update).then(
+    // 인스타 사진 게시물은 다운로더가 로그인을 요구해서 실패한다 → 웹 캡처로 다시 시도 (좌우로 넘기는 사진 전부 받음)
+    const insta = /(^|\.)instagram\.com$/i.test(host) && mode !== 'video' && mode !== 'audio';
+    const work = !video ? runCapture(job, s, update)
+      : runDownload(job, s, update).catch(e => {
+        if (!insta) throw e;
+        log(`  ↻ 인스타 사진 게시물로 보고 웹 캡처로 다시: ${e.message.slice(0, 80)}`);
+        update({ target: CAP.name, step: '사진 게시물이라 웹 캡처로 받는 중', error: '' });
+        return runCapture(job, s, update);
+      });
+    work.then(
       () => log(`  ✔ 공유 완료: ${job.file || url}`),
       e => {
         let error = e.message.replace(/\x1b\[[0-9;]*m/g, '').replace(/ERROR:\s*/g, '');
