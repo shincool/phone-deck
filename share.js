@@ -19,15 +19,30 @@ const CAP = { host: '127.0.0.1', port: 8780, name: '웹 캡처' };
 const jobs = [];          // 최근 보낸 것 (최대 30개)
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+// 통합 다운로더(github.com/shincool/integrated-downloader)를 옆 폴더에서 찾는다 — ZIP 으로 받으면 폴더 이름이 -main 으로 끝남
+function findDownloader() {
+  const names = ['yt-web', 'integrated-downloader', 'integrated-downloader-main'];
+  const hit = names.map(n => path.join(TOOLS, n)).find(d => fs.existsSync(path.join(d, 'app.py')));
+  return hit || path.join(TOOLS, names[0]);
+}
+
+// 통합 다운로더의 run.bat 이 만든 .venv 가 있으면 그 파이썬을 쓴다 (필요한 부품이 거기에 깔려 있음)
+function downloaderPython(dir, configured) {
+  if (configured) return configured;
+  const venv = path.join(dir, '.venv', 'Scripts', 'python.exe');
+  return fs.existsSync(venv) ? venv : 'python';
+}
+
 function settings(config) {
   const s = (config && config.share) || {};
   const home = os.homedir();
+  const downloaderDir = s.downloaderDir || findDownloader();
   return {
-    // 기본값: 폰덱과 같은 '내프로그램' 폴더 안의 옆 폴더들 (폴더째 옮겨도 그대로 찾음)
-    downloaderDir: s.downloaderDir || path.join(TOOLS, 'yt-web'),
+    // 기본값: 폰덱과 같은 폴더 안의 옆 폴더들 (폴더째 옮겨도 그대로 찾음)
+    downloaderDir,
     captureDir: s.captureDir || path.join(TOOLS, 'web-capture'),
     saveDir: s.saveDir || path.join(home, 'Downloads'),
-    python: s.python || 'python',
+    python: downloaderPython(downloaderDir, s.python),
     login: s.login || 'none',
     organizerDir: s.organizerDir || path.join(TOOLS, 'download-organizer'),
     autoSort: s.autoSort !== false,
@@ -109,13 +124,20 @@ async function runDownload(job, s, update) {
     kind: info.kind || 'video', count: info.count || 0 };
   const { job_id: id } = await request(DL, 'POST', '/api/download', body);
   const started = Date.now();
+  let p;
   for (;;) {
     await sleep(1500);
-    const p = await request(DL, 'GET', `/api/progress/${id}`);
+    p = await request(DL, 'GET', `/api/progress/${id}`);
     if (p.status === 'error') throw new Error(p.error || '다운로드 실패');
     if (p.status === 'done') break;
     update({ step: p.status === 'processing' ? '마무리 중' : `받는 중 ${Math.round(p.percent || 0)}%` });
     if (Date.now() - started > 60 * 60 * 1000) throw new Error('너무 오래 걸려서 멈췄어요');
+  }
+  // 다운로더가 '채널별 자동 정리'로 이미 채널백업 폴더에 넣었으면 그대로 둔다
+  if (p.saved_to) {
+    const parts = String(p.saved_rel || p.saved_to).split(/[\\/]/);
+    update({ status: 'done', step: '완료', file: parts[parts.length - 1], folder: parts.slice(0, -1).join('\\') });
+    return;
   }
   // 브라우저로 받을 때와 똑같이 파일을 다운로드 폴더에 저장 → 다운로드 정리가 제자리로 옮겨 준다
   const res = await request(DL, 'GET', `/api/file/${id}`, undefined, { raw: true, timeout: 600000 });
